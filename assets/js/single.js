@@ -2,29 +2,26 @@
 //==================================
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
-
+var repoNameEl = document.querySelector("#repo-name");
 
 
 
 //functions
 //====================================
 var getRepoIssues = function(repo) {
-	// var apiUrl = `https://api.github.com/repos/${repo}/issues?direction=asc`;
-	var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
+	var apiUrl = `https://api.github.com/repos/${repo}/issues?direction=asc`;
 	
 	fetch(apiUrl)
 	.then(function(response) {
-		if (response.ok) {
-			response.json()
-			.then(function(data) {
-				displayIssues(data);
-				if (response.headers.get("Link")) {
-					displayWarning(repo);
-				}
-			});
-		} else {
-			alert("There was a problem with your request!");
-		}
+		if (!response.ok)
+			document.location.replace("./index.html");
+		response.json()
+		.then(function(data) {
+			displayIssues(data);
+			if (response.headers.get("Link")) {
+				displayWarning(repo);
+			}
+		});
 	});
 };
 
@@ -78,6 +75,24 @@ var displayWarning = function(repo) {
   limitWarningEl.appendChild(linkEl);
 };
 
+var getRepoName = function() {
+	var queryString = document.location.search;
+	var repoName = queryString.split("=")[1];
+	// if(repoName) {
+		// getRepoIssues(repoName);
+		// repoNameEl.textContent = repoName;
+	// } else {
+		// document.location.replace("./index.html");
+	// }
+	if(!repoName) 
+		document.location.replace("./index.html");
+	getRepoIssues(repoName);
+	repoNameEl.textContent = repoName;
+};
+
+
+
+
 
 
 //listeners
@@ -95,10 +110,7 @@ var displayWarning = function(repo) {
 
 //body
 //=====================================
-// getRepoIssues("moses-ian/git-it-done");
-// getRepoIssues("moses-ian/code-quiz");
-getRepoIssues("facebook/react");
-
+getRepoName();
 
 
 
